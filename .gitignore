@@ -1,0 +1,7 @@
+/build/
+libft/tests/
+libft/ft_printf/libftprintf_darwin.o
+/test*.dSYM
+
+ft_nm
+ft_otool
