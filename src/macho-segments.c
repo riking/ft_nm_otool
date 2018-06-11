@@ -6,7 +6,7 @@
 /*   By: kyork <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/11 14:06:45 by kyork             #+#    #+#             */
-/*   Updated: 2018/06/11 14:17:50 by kyork            ###   ########.fr       */
+/*   Updated: 2018/06/11 14:33:25 by kyork            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void			ft_mh_iter_segment64(t_iter *iter, const void *cmd)
 	const struct segment_command_64	*c;
 	const struct section_64			*sect;
 	const struct section_64			*enditer;
-	int								i;
+	uint32_t						i;
 
 	c = cmd;
 	if (iter->cb->seg)

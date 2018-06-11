@@ -6,7 +6,7 @@
 /*   By: kyork <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/07 15:49:55 by kyork             #+#    #+#             */
-/*   Updated: 2018/06/11 13:47:55 by kyork            ###   ########.fr       */
+/*   Updated: 2018/06/11 14:32:00 by kyork            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,19 +55,6 @@ static void		fatal_error(int errnum, char *file)
     exit(1);
 }
 
-static void	cb_cmd(void *data, uint32_t type,
-			const void *cmd_body, size_t cmd_size)
-{
-    if (type & LC_REQ_DYLD)
-		type = type & ~LC_REQ_DYLD;
-	if (type == LC_SEGMENT_64)
-		debug_segment_64(data, cmd_body, cmd_size);
-	else
-		ft_printf("Section type %3x: %zd bytes\n", type, cmd_size);
-}
-
-#define EMPTY_INIT {0,}
-
 int		main(int argc, char **argv)
 {
     t_mfile				memfile;
@@ -78,18 +65,19 @@ int		main(int argc, char **argv)
 
     ft_set_progname(argv[0]);
     if (argc != 2)
-	exit(2);
+		exit(2);
     errnum = ft_mh_mfile_open(&memfile, argv[1]);
     if (0 != errnum)
-	fatal_error(errnum, argv[1]);
-    cbs = (t_callbacks){0, 0, &cb_cmd, 0};
-    cbs.cmd = &cb_cmd;
+		fatal_error(errnum, argv[1]);
+	data.file = &memfile;
+    cbs = (t_callbacks){&data, 0, &debug_loadcmd, &debug_segment,
+		&debug_section, 0};
     errnum = ft_mh_iter_start(&it, &memfile, &cbs);
     if (0 != errnum)
-	fatal_error(errnum, argv[1]);
+		fatal_error(errnum, argv[1]);
     while (0 == errnum)
-	errnum = ft_mh_iter_next(&it);
+		errnum = ft_mh_iter_next(&it);
     if (errnum != -1)
-	fatal_error(errnum, argv[1]);
+		fatal_error(errnum, argv[1]);
     return (0);
 }
