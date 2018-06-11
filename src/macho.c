@@ -6,7 +6,7 @@
 /*   By: kyork <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/07 12:48:35 by kyork             #+#    #+#             */
-/*   Updated: 2018/06/07 16:15:55 by kyork            ###   ########.fr       */
+/*   Updated: 2018/06/11 14:06:14 by kyork            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,13 +69,19 @@ int				ft_mh_iter_next(t_iter *iter)
 
 	if (iter->cmd_cur >= iter->cmd_count)
 		return (-1);
-	if ((((char*)iter->cur_command) - iter->file->ptr) > (ptrdiff_t)iter->file->size)
+	if ((((char*)iter->cur_command) - iter->file->ptr) >
+			(ptrdiff_t)iter->file->size)
 		return (ERR_TRUNC);
 	cmd = iter->cur_command;
-	iter->cur_command = (void*)(((char*)cmd) + swap32i(cmd->cmdsize));
+	iter->cur_command = (typeof(cmd))
+		(((const char*)cmd) + swap32i(cmd->cmdsize));
 	iter->cmd_cur++;
 	iter->cb->cmd(iter->cb->data, swap32i(cmd->cmd),
 			cmd, swap32i(cmd->cmdsize));
+	if (swap32i(cmd->cmd) == LC_SEGMENT)
+		ft_mh_iter_segment32(iter, cmd);
+	if (swap32i(cmd->cmd) == LC_SEGMENT_64)
+		ft_mh_iter_segment64(iter, cmd);
 	return (0);
 }
 

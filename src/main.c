@@ -6,11 +6,12 @@
 /*   By: kyork <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/06/07 15:49:55 by kyork             #+#    #+#             */
-/*   Updated: 2018/06/07 16:21:02 by kyork            ###   ########.fr       */
+/*   Updated: 2018/06/11 13:47:55 by kyork            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "macho_iter.h"
+#include "load_commands.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -38,18 +39,18 @@ static void		fatal_error(int errnum, char *file)
 
     if (errnum == -1)
     {
-	ft_dprintf(2, "%s: %s: error\n", ft_progname(), file);
+		ft_dprintf(2, "%s: %s: error\n", ft_progname(), file);
     }
     else if ((errnum & ERRNUM_STDLIB_MASK) != 0)
     {
-	ft_dprintf(2, "%s: %s: %s: %s\n", ft_progname(), file,
-		g_op_names[errnum >> 24],
-		sys_errlist[errnum & ~ERRNUM_STDLIB_MASK]);
+		ft_dprintf(2, "%s: %s: %s: %s\n", ft_progname(), file,
+			g_op_names[errnum >> 24],
+			sys_errlist[errnum & ~ERRNUM_STDLIB_MASK]);
     }
     else if ((errnum & ERRNUM_CUSTOM) != 0)
     {
-	msg = g_custom_errs[errnum & ~ERRNUM_CUSTOM];
-	ft_dprintf(2, "%s: %s: %s\n", ft_progname(), file, msg);
+		msg = g_custom_errs[errnum & ~ERRNUM_CUSTOM];
+		ft_dprintf(2, "%s: %s: %s\n", ft_progname(), file, msg);
     }
     exit(1);
 }
@@ -57,21 +58,23 @@ static void		fatal_error(int errnum, char *file)
 static void	cb_cmd(void *data, uint32_t type,
 			const void *cmd_body, size_t cmd_size)
 {
-    (void)data;
     if (type & LC_REQ_DYLD)
-	type = type & ~LC_REQ_DYLD;
-    ft_printf("Section type %3x: %zd bytes\n", type, cmd_size);
-    (void)cmd_body;
+		type = type & ~LC_REQ_DYLD;
+	if (type == LC_SEGMENT_64)
+		debug_segment_64(data, cmd_body, cmd_size);
+	else
+		ft_printf("Section type %3x: %zd bytes\n", type, cmd_size);
 }
 
 #define EMPTY_INIT {0,}
 
 int		main(int argc, char **argv)
 {
-    t_mfile	memfile;
-    t_iter	it;
-    t_callbacks	cbs;
-    int		errnum;
+    t_mfile				memfile;
+    t_iter				it;
+    t_callbacks			cbs;
+	t_debug_cmd_data	data;
+    int					errnum;
 
     ft_set_progname(argv[0]);
     if (argc != 2)

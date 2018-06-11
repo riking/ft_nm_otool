@@ -6,7 +6,7 @@
 #    By: kyork <marvin@42.fr>                       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2016/10/09 19:11:26 by kyork             #+#    #+#              #
-#    Updated: 2018/06/07 16:18:39 by kyork            ###   ########.fr        #
+#    Updated: 2018/06/11 14:28:59 by kyork            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,9 @@ OTOOL_SRC	+=
 OTOOL_SRC	+= 
 OTOOL_SRC	+= 
 
-COMMON_SRC	+= main.c macho.c swap.c
+COMMON_SRC	+= main.c swap.c
+COMMON_SRC	+= macho.c macho-segments.c
+COMMON_SRC	+= debugseg.c
 
 COMMONOBJS	= $(addprefix build/common-, $(COMMON_SRC:.c=.o))
 NM_OBJS		= $(addprefix build/nm-, $(NM_SRC:.c=.o)) $(COMMONOBJS)
